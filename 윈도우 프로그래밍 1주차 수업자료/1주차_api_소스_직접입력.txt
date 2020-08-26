@@ -1,0 +1,70 @@
+#include <Windows.h>
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPreInstance, LPSTR lpszCmdLine, int nCmdShow){
+	HWND	hwnd;
+	MSG		msg;
+	WNDCLASS	WndClass;
+	//WndClass.cbSize = sizeof(WndClass);			// 윈도우 클래스의 기본 크기
+	// 윈도우 크기를 변경하고자 할때 다시 그리는 형태의 윈도라는 의미
+	WndClass.style = CS_HREDRAW | CS_VREDRAW;	
+	WndClass.lpfnWndProc = WndProc;                             // 윈도우 프로시저 지정
+	WndClass.cbClsExtra = 0;                                   // 윈도우클래스 데이터 영역
+	WndClass.cbWndExtra = 0;                                   // 윈도우의 데이터 영역
+	WndClass.hInstance = hInstance;                           // 인스턴스 핸들
+	WndClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);      // 아이콘 핸들
+	WndClass.hCursor = LoadCursor(NULL, IDC_ARROW);          // 사용할 커서 핸들
+	WndClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH); // 바탕색 브러쉬 핸들
+	WndClass.lpszMenuName = NULL;                                // 메뉴 이름            
+	WndClass.lpszClassName = TEXT("처음하는 API");              // 윈도우 클래스 이름       
+	RegisterClass(&WndClass);				// 커널에 등록, 위도우 클래스 이름 기억할 것
+	hwnd = CreateWindow(
+			TEXT("처음하는 API")				// 윈도우 클래스 이름
+		, TEXT("처음하는 API 제목표시줄")	// 타이틀 바에 출력될 문자열
+		, WS_OVERLAPPEDWINDOW			// 윈도우 스타일
+		, CW_USEDEFAULT				// 윈도우의 좌측 상단의 X좌표
+		, CW_USEDEFAULT				// 윈도우의 우측 상단의 Y좌표
+		, CW_USEDEFAULT				// 윈도우의 폭
+		, CW_USEDEFAULT				// 윈도우의 높이
+		, NULL					// 부모 윈도우의 핸들
+		, NULL					// 메뉴 혹은 자식 윈도우의 식별자
+		, hInstance				// 윈도우를 생성한 인스턴스 핸들
+		, NULL);				// CREATESTRUCT 구조체를 통해 전달되는 값
+	if (!hwnd)		// 윈도우 생성에 실패하면
+		return (FALSE);	//프로그램 종료
+
+	ShowWindow(hwnd, nCmdShow);	//윈도우를 화면에 나타낸다.
+	UpdateWindow(hwnd);		// 윈도우의클라이언트 영역을 표시한다.
+
+	// 메시루프 : 루프를 돌며 메시지 큐로 부터 메시지를 얻어와 처리한다.
+	while (GetMessage(&msg, NULL, 0, 0)){
+		TranslateMessage(&msg);		// 키보드 메시지를 번역
+		DispatchMessage(&msg);		// 메시지를 해당 윈도우 프로지져로 보낸다.
+	}
+	return msg.wParam;
+
+}
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+
+{
+	// switch-case문을 써서 메시지의 종류에 따라
+	// 적절한 작업을 수행한다.
+
+	switch (uMsg)
+	{
+	case WM_LBUTTONDOWN: // 마우스 좌측 버튼을 누른 경우
+		// 메시지 박스를 표시한다. 
+		MessageBox(hWnd, TEXT("마우스 좌측 버튼을 눌렀습니다"), TEXT("마우스 테스트 "), MB_OK);
+		break;
+
+	case WM_DESTROY:      // 프로그램에 종료 메시지가 온 경우
+		PostQuitMessage(0); // WM_QUIT메시지를 발생시켜 메시지루프를 중단한다.
+		break;
+
+	default:             // 처리하지 않은 메시지는 
+		return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		// DefWindowProc()가 처리하도록 한다.
+	}
+	return 0;
+}

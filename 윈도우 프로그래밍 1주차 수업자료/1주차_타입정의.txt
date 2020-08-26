@@ -1,0 +1,139 @@
+****************************************************************
+[ 타입 정의 ]
+****************************************************************
+#ifdef UNICODE 
+       typedef wchar_t TCHAR;  // 2byte
+#else 
+       typedef char TCHAR;       // 1byte
+#endif
+
+
+
+****************************************************************
+[ 함수 정의 ]
+****************************************************************
+#ifdef UNICODE 
+      typedef SetWindowTextW SetWindowText; 
+#else 
+      typedef SetWindowTextA SetWindowText; 
+#endif
+
+
+
+
+****************************************************************
+UNICODE가 정의 되면,
+****************************************************************
+TCHAR == wchar_t
+TEXT == _TEXT == L
+
+
+****************************************************************
+_UNICODE가 정의 되면,
+****************************************************************
+TCHAR == wchar_t
+_T == __T == _TEXT == L
+
+따라서 UNICODE, _UNICODE가 모두 정의 되어야 한다.
+
+
+
+
+****************************************************************
+_MBCS가 정의 되면,
+****************************************************************
+TCHAR == char
+_T == __TEXT == 사라짐
+
+
+****************************************************************
+UNICODE, _UNICODE, _MBCS 중 어느것도 정의 되지 않으면,
+****************************************************************
+TCHAR == char
+_T == __TEXT == 사라짐
+
+
+
+****************************************************************
+[ 예) 상수 문자열 ]
+****************************************************************
+[ 예) 상수 문자열 ]
+
+LPTSTR  lpszStr = "My string";           // 문자열을 ANSI 문자열로 간주, 
+                                                    // 데이터형 불일치로 에러가 발생한다.
+
+TCHAR   *lpszStr = T("My string");
+LPTSTR  lpszStr = _T("My string");     // _UNICODE가 정의되어 있으면 _T()는 유니코드 
+                                                     // 문자열 상수로 변환하고, _MBCS가 정의되어 있으면
+                                                     // ANSI 문자열 상수로 변환한다.
+
+LPTSTR  lpszStr = TEXT("My string"); // 상동
+
+LPWSTR  lpszStr = L("My string");       // 유니코트 문자열로 지정하는 매크로 함수 L()
+
+
+
+
+
+****************************************************************
+[ 예) 문자열 버퍼 길이 계산 ]
+****************************************************************
+#define _UNICODE
+
+TCHAR szBuffer[200];                               // szBuffer의 크기는 400 bytes
+
+DWORD dwlen;
+dwlen = sizeof(szBuffer);                           // 400 bytes
+dwlen = sizeof(szBuffer) / sizeof(TCHAR);  // 실제 저장 가능한 유니코드 문자 개수는 200개
+****************************************************************
+
+
+
+****************************************************************
+[ 예) 표준 문자열 라이브러리 함수 ]
+****************************************************************
+표준 C 런타임 함수 strlen()에 해당하는 유니코드 함수는 wcslen()이지만, 
+_tcslen()을 사용하면 _UNICODE, _MBCS 정의에 따라 컴파일시에 알아서 적절히 변환된다.
+(tchar.h에 다 정의되어 있다.)
+****************************************************************
+ANSI            Unicode          TCHAR type
+--------------------------------------
+strlen()        wcslen()         _tcslen()
+strcat()        wcscat()         _tcscat()
+strchr()        wcschr()         _tcschr()
+strcmp()        wcscmp()         _tcscmp()
+strcpy()        wcscpy()         _tcscpy()
+strstr()        wcsstr()         _tcsstr()
+strrev()        _wcsrev()        _tcsrev()
+
+printf()         wprintf()       _tprintf()
+sprintf()       swprintf()       _stprintf()
+scanf()         wscanf()          _tscanf()
+
+
+
+
+****************************************************************
+[ 예) ANSI 문자열과 Unicode 문자열 간의 변환 ]
+****************************************************************
+
+(1) Multi-Byte String을 Wide Character String(유니코드)으로 변환
+               mbstowcs(WCHAR *des, char *src, int BufferSize);
+
+(2) Wide Character String(유니코드)을 Multi-Byte String으로 변환
+               wcstombs(char *des, WCHAR *src, int BufferSize);
+
+
+
+****************************************************************
+[ 타입 정의 ]
+****************************************************************
+typedef CHAR *   LPSTR, *PSTR;
+        CHAR * == LPSTR == PSTR
+
+typedef CONST CHAR * LPCSTR, *PCSTR;
+        CONST CHAR * == LPCSTR == PCSTR
+
+LPTSTR   = TCHAR *
+
+LPCTSTR = CONST TCHAR *
